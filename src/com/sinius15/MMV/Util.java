@@ -1,56 +1,65 @@
 package com.sinius15.MMV;
 
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
-import com.sinius15.MMV.components.HeapFrame;
 import com.sinius15.MMV.components.PrimitiveVariable;
-import com.sinius15.MMV.components.ReferenceVariable;
 import com.sinius15.MMV.components.Variable;
+import com.sinius15.MMV.components.primitives.*;
+import com.sinius15.MMV.exceptions.UnsuportedException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Util {
 
-	public static Variable createVarFromDeclaration(Application app, FieldDeclaration field) {
+	public static List<Variable> createVarFromDeclaration(Application app, FieldDeclaration field) {
+        List<Variable> out = new ArrayList<>();
+
 		Type t = field.getType();
-		String declaration = field.toString();
+
 		if (t instanceof PrimitiveType) {
-			declaration = declaration.replace(t.toString(), "").replace(";", "").trim();
+            PrimitiveType primitiveType =  (PrimitiveType)t;
 
-			String[] split = declaration.split("=");
-			if (split.length == 1)
-				return new PrimitiveVariable(split[0].trim(), null);
-			else
-				return new PrimitiveVariable(split[0].trim(), split[1].trim());
-		} else if (t instanceof ReferenceType) {
-			ReferenceType ref = (ReferenceType) t;
+            for(VariableDeclarator d : field.getVariables()){
+                out.add(createPrimitive(d.getId().getName(), primitiveType, d.getInit() == null ? null : d.getInit().toString()));
+            }
 
-			//get variable name
-			String name = declaration.toString().trim().replaceFirst(ref.toString(), "").replaceAll(";", "").trim();
-			String[] split = name.split("=");
-			name = split[0].trim();
-
-			ReferenceVariable outRefVar = new ReferenceVariable(name, -1);
-
-			//is variable already initialized?
-			if(split.length > 1){
-				String value = split[1].trim();
-				if(value.startsWith("\"") && value.endsWith("\"")){
-					char[] values = value.substring(1, value.length()-1).toCharArray();
-					HeapFrame arrayHeap = new HeapFrame("String");
-					for(int i =0; i < values.length; i++){
-						arrayHeap.addVariable(new PrimitiveVariable("[" + i + "]", values[i]));
-					}
-					outRefVar.setReferencingTo(app.heap.addHeapFrame(arrayHeap));
-				}else if (ref.getArrayCount() == 1) {
-					throw new IllegalArgumentException("Ik kan nog niet arrays aan de HEAP toevoegen. Uitgezonderd Strings");
-				}else{
-					throw new IllegalArgumentException("Ik kan nog niet objecten aan de HEAP toevoegen. Uitgezonderd Strings");
-				}
-			}
-			return outRefVar;
+		} else {
+            throw new UnsuportedException("Only support primitive types");
 		}
-		return null;
+		return out;
 	}
+
+    public static Variable<?> createVarFromExpression(Expression e){
+        System.out.println(e.getClass().getName());
+
+        return null;
+    }
+
+    private static PrimitiveVariable<?> createPrimitive(String name, PrimitiveType var, String init) {
+
+        switch (var.getType()) {
+            case Boolean:
+                return new BooleanPrimitive(name, init == null ? false : Boolean.valueOf(init));
+            case Char:
+                return new CharPrimitive(name, (init == null) ? 0 : init.charAt(0));
+            case Byte:
+                return new BytePrimitive(name, (init == null) ? (byte) 0 : Byte.valueOf(init));
+            case Short:
+                return new ShortPrimitive(name, (init == null) ? (short) 0 : Short.valueOf(init));
+            case Int:
+                return new IntegerPrimitive(name, (init == null) ? 0 : Integer.valueOf(init));
+            case Long:
+                return new LongPrimitive(name, (init == null) ? 0l : Long.valueOf(init));
+            case Float:
+                return new FloatPrimitive(name, (init == null) ? 0f : Float.valueOf(init));
+            case Double:
+                return new DoublePrimitive(name, (init == null) ? .0 : Double.valueOf(init));
+        }
+        return null; //impossible.
+    }
 
 }

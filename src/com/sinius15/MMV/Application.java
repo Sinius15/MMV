@@ -46,8 +46,10 @@ public class Application {
 		for(BodyDeclaration declaration : decs){
 			if(declaration instanceof FieldDeclaration){
 				FieldDeclaration field = (FieldDeclaration) declaration;
-				Variable v = Util.createVarFromDeclaration(this, field);
-				globalHeapFrame.addVariable(v);
+				List<Variable> newVars = Util.createVarFromDeclaration(this, field);
+                for(Variable newVar : newVars) {
+                    globalHeapFrame.addVariable(newVar);
+                }
 			}
 		}
 		heap.addHeapFrame(globalHeapFrame);
@@ -72,7 +74,7 @@ public class Application {
 	public static void main(String[] args) {
 		try {
 			Application app = new Application("test/testClass.java");
-			app.simulateUntil("stopikwilstoppen");
+			//app.simulateUntil("stopikwilstoppen");
 			System.out.println();
 			System.out.println();
 			System.out.println();

@@ -2,27 +2,19 @@ package com.sinius15.MMV.components;
 
 import com.sinius15.MMV.Application;
 
-public class ReferenceVariable extends Variable{
-
-	//-1 == null
-	private int referencingTo;
+public class ReferenceVariable extends Variable<Integer>{
 
 	public ReferenceVariable(String name, int referenceId) {
-		super(name);
-		this.referencingTo = referenceId;
+		super(name, referenceId);
 	}
 
-	public HeapFrame referencingTo(Application app){
-		return app.heap.getHeapFrame(referencingTo);
-	}
-
-	public void setReferencingTo(int referenceId){
-		this.referencingTo = referenceId;
-	}
+	public HeapFrame referencingTo(Application app) {
+        return app.heap.getHeapFrame(getValue());
+    }
 
 	@Override
 	public String toString() {
-		return getName() +(referencingTo == -1 ? "" : (" refering to " + referencingTo));
+		return getName() +(getValue() == -1 ? "" : (" referencing to " + getValue()));
 	}
 
 }
