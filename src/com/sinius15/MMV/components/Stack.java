@@ -25,4 +25,7 @@ public class Stack {
 		return s;
 	}
 
+    public Stackframe getTopStackFrame() {
+        return stackFrames.get(stackFrames.size()-1);
+    }
 }

@@ -7,15 +7,14 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.sinius15.MMV.components.Heap;
-import com.sinius15.MMV.components.HeapFrame;
-import com.sinius15.MMV.components.Stack;
-import com.sinius15.MMV.components.Variable;
+import com.sinius15.MMV.components.*;
 
 import java.io.FileInputStream;
 import java.util.List;
 
 public class Application {
+
+    public static final String STOPSTRING = "stopikwilstoppen";
 
 	private CompilationUnit cu;
 
@@ -46,7 +45,7 @@ public class Application {
 		for(BodyDeclaration declaration : decs){
 			if(declaration instanceof FieldDeclaration){
 				FieldDeclaration field = (FieldDeclaration) declaration;
-				List<Variable> newVars = Util.createVarFromDeclaration(this, field);
+				List<Variable> newVars = Util.createVarFromDeclaration(field);
                 for(Variable newVar : newVars) {
                     globalHeapFrame.addVariable(newVar);
                 }
@@ -55,8 +54,8 @@ public class Application {
 		heap.addHeapFrame(globalHeapFrame);
 	}
 
-	public void simulateUntil(String stopString){
-		new MethodExecutor(stopString, setupMethod, this).start();
+	public void simulateUntil(){
+		new MethodExecutor(setupMethod, this).start();
 	}
 
 	public MethodDeclaration getMethodDeclarationByName(String name) {
@@ -74,7 +73,7 @@ public class Application {
 	public static void main(String[] args) {
 		try {
 			Application app = new Application("test/testClass.java");
-			//app.simulateUntil("stopikwilstoppen");
+			app.simulateUntil();
 			System.out.println();
 			System.out.println();
 			System.out.println();
@@ -84,4 +83,7 @@ public class Application {
 		}
 	}
 
+    public Stackframe getTopStackFrame() {
+        return stack.getTopStackFrame();
+    }
 }

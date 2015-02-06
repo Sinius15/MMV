@@ -1,4 +1,4 @@
-package com.sinius15.MMV.Executors;
+package com.sinius15.MMV.expressionExecutors;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -9,11 +9,9 @@ import com.sinius15.MMV.MethodExecutor;
 public class MethodCallExprExecutor extends GenericVisitorAdapter<Boolean, String> {
 
 	Application app;
-	String stopString;
 
-	public MethodCallExprExecutor(Application app, String stopString){
+	public MethodCallExprExecutor(Application app){
 		this.app = app;
-		this.stopString = stopString;
 	}
 
 	public Boolean visit(MethodCallExpr method, String arg) {
@@ -22,7 +20,7 @@ public class MethodCallExprExecutor extends GenericVisitorAdapter<Boolean, Strin
 		if(decl == null)
 			throw new IllegalArgumentException("Could not find method " + method.getName());
 
-		MethodExecutor exe = new MethodExecutor(stopString, decl, app);
+		MethodExecutor exe = new MethodExecutor(decl, app);
 		return exe.start();
 	}
 

@@ -2,60 +2,43 @@ package com.sinius15.MMV;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.expr.AssignExpr;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.sinius15.MMV.Executors.AssignExprExecutor;
-import com.sinius15.MMV.Executors.MethodCallExprExecutor;
-import com.sinius15.MMV.Executors.VariableDeclarationExprExecutor;
 import com.sinius15.MMV.components.Stackframe;
+import com.sinius15.MMV.exceptions.UnsuportedException;
+import com.sinius15.MMV.statementExecutors.ExpressionStmtExecutor;
 
 import java.util.List;
 
+/**
+ * Give me a Method, and i will execute it.
+ */
 public class MethodExecutor extends VoidVisitorAdapter<String> {
 
 	private boolean foundStopString = false;
 
 	private Application app;
 	private MethodDeclaration method;
-	private String stopString;
 
-	private Stackframe curFrame;
-
-	public MethodExecutor(String stopString, MethodDeclaration method, Application app){
-
-		this.stopString = stopString;
+	public MethodExecutor(MethodDeclaration method, Application app){
 		this.method = method;
 		this.app = app;
-
 	}
 
-	public boolean start(){
-		curFrame = new Stackframe(method.getName());
-		app.stack.addStackframe(curFrame);
+	public boolean start() {
+        app.stack.addStackframe(new Stackframe(method.getName()));
 
-		List<Parameter> parameters = method.getParameters();
-		if(parameters != null){	//this function has parameters
-			throw new IllegalArgumentException("Parameters are not yet supported!");
-		}
-		method.getBody().accept(this, null);
-		if(foundStopString)
-			return true;
+        List<Parameter> parameters = method.getParameters();
+        if (parameters != null) {
+            throw new IllegalArgumentException("Parameters are not yet supported!");
+        }
+        method.getBody().accept(this, null);
+        if (foundStopString)
+            return true;
 
-		app.stack.removeStackframe();
-		return foundStopString;
-	}
-
-	@Override
-	public void visit(DoStmt n, String arg) {
-		System.out.println(n);
-	}
+        app.stack.removeStackframe();
+        return foundStopString;
+    }
 
 	@Override
 	public void visit(BlockStmt n, String arg) {
@@ -70,42 +53,58 @@ public class MethodExecutor extends VoidVisitorAdapter<String> {
 
 	public boolean visitStatement(Statement t){
 		String tString = t.toString();
-		if(tString.contains(stopString)){
+		if(tString.contains(Application.STOPSTRING)){
 			return true;
 		}
 
 		if(t instanceof ExpressionStmt){
-			t.accept(this, null);
-		}else{
+            ExpressionStmtExecutor exe = new ExpressionStmtExecutor(app);
+			t.accept(exe, null);
+		}else if(t instanceof AssertStmt){
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof BlockStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof BreakStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ContinueStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof DoStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof EmptyStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ExplicitConstructorInvocationStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ForeachStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ForStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof IfStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof LabeledStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ReturnStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof SwitchEntryStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof SwitchStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof SynchronizedStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof ThrowStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof TryStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof TypeDeclarationStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else if(t instanceof WhileStmt) {
+            throw new UnsuportedException("I do not support " + t.getClass().getName());
+        }else{
 			throw new IllegalArgumentException("I do not support " + tString.getClass().getName());
 		}
 
 		return false;
 	}
 
-	/**
-	 * elke Regel code wordt hier gehandeld.
-	 */
-	@Override
-	public void visit(ExpressionStmt t, String arg) {
-		if(foundStopString)
-			return;
-		Expression e = t.getExpression();
-		//System.out.println(e.toString() + "  \t\t" + e.getClass().getName());
-		if(e instanceof AssignExpr){
-			AssignExprExecutor ass = new AssignExprExecutor(app, curFrame);
-			e.accept(ass, null);
-		}else if(e instanceof VariableDeclarationExpr){
-			VariableDeclarationExprExecutor ass = new VariableDeclarationExprExecutor(app, curFrame);
-			e.accept(ass,  null);
-		}else if(e instanceof MethodCallExpr){
-			MethodCallExprExecutor ass = new MethodCallExprExecutor(app, stopString);
-			if(e.accept(ass,  null)){
-				foundStopString = true;
-			}
-		}else{
-			throw new IllegalArgumentException("I do not support " + e.getClass().getName());
-		}
-	}
+
 
 }

@@ -1,4 +1,4 @@
-package com.sinius15.MMV.Executors;
+package com.sinius15.MMV.expressionExecutors;
 
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -12,8 +12,8 @@ import com.sinius15.MMV.components.Variable;
 
 public class AssignExprExecutor extends VoidVisitorAdapter<String> {
 
-	Application app;
-	Stackframe curFrame;
+	private final Application app;
+	private final Stackframe curFrame;
 
 	public AssignExprExecutor(Application app, Stackframe curFrame){
 		this.app = app;
@@ -22,6 +22,8 @@ public class AssignExprExecutor extends VoidVisitorAdapter<String> {
 
 	@Override
 	public void visit(AssignExpr n, String arg) {
+        System.out.println("visiting");
+
 		//target
 		Expression target = n.getTarget();
 		String targetName;
