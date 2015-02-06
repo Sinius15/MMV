@@ -55,7 +55,9 @@ public class Application {
 	}
 
 	public void simulateUntil(){
-		new MethodExecutor(setupMethod, this).start();
+        Executors exe = new Executors();
+        cu.accept(exe, null);
+		//new MethodExecutor(setupMethod, this).start();
 	}
 
 	public MethodDeclaration getMethodDeclarationByName(String name) {
@@ -77,7 +79,7 @@ public class Application {
 			System.out.println();
 			System.out.println();
 			System.out.println();
-			app.createMemoryModel();
+			//app.createMemoryModel();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

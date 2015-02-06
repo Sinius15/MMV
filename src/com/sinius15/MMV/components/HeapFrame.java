@@ -37,8 +37,4 @@ public class HeapFrame {
 		s+="--------------";
 		return s;
 	}
-
-
-
-
 }

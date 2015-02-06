@@ -6,15 +6,16 @@ public class TestClass {
 
     void setup() {
         int j = 560;
-
         int q = j+f+j;
-
         keerTien();
-
         String s = "stopikwilstoppen";
     }
 
     void keerTien(){
         getal1 = getal1 * 10;
+    }
+
+    public class Damsteen{
+        int a = 0;
     }
 }
